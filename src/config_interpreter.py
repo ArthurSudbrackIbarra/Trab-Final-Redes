@@ -17,18 +17,3 @@ class ConfigInterpreter:
         self.tokenTime = int(lines[2].strip())
         # Is Token True
         self.isTokenTrue = True if lines[3].strip() == "true" else False
-
-    def getNextMachineIP(self):
-        return self.nextMachineIP
-
-    def getNextMachinePort(self):
-        return self.nextMachinePort
-
-    def getNickname(self):
-        return self.nickname
-
-    def getTokenTime(self):
-        return self.tokenTime
-
-    def getIsTokenTrue(self):
-        return self.isTokenTrue
