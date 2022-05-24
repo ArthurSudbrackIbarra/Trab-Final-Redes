@@ -7,23 +7,16 @@ class ConfigInterpreter:
         absoluteFilePath = os.path.abspath(filePath)
         configFile = open(absoluteFilePath, 'r')
         lines = configFile.readlines()
-        count = 0
-        for line in lines:
-            content = line.strip()
-            if count == 0:
-                splitted = content.split(":")
-                self.nextMachineIP = splitted[0]
-                self.nextMachinePort = splitted[1]
-            elif count == 1:
-                self.nickname = content
-            elif count == 2:
-                self.tokenTime = int(content)
-            elif count == 3:
-                if content == "true":
-                    self.isTokenTrue = True
-                else:
-                    self.isTokenTrue = False
-            count += 1
+        # Machine IP
+        splitted = lines[0].strip().split(":")
+        self.nextMachineIP = splitted[0]
+        self.nextMachinePort = splitted[1]
+        # Nickname
+        self.nickname = lines[1].strip();
+        # Token Time
+        self.tokenTime = int(lines[2].strip())
+        # Is Token True
+        self.isTokenTrue = True if lines[3].strip() == "true" else False
 
     def getNextMachineIP(self):
         return self.nextMachineIP
