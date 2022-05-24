@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
+
+from machine import Machine
+
 def main():
-    print("Oi!")
-
-
-
-
-    
+    machine = Machine("Bob")
+    name = machine.getName()
+    print(name)
 
 if __name__ == "__main__":
     main()
