@@ -16,6 +16,6 @@ class CustomUDPServerSocket:
             bytesToSend = str.encode(message)
             bytesAddressPair = self.UDPServerSocket.recvfrom(self.bufferSize)
             receivedMessage = bytesAddressPair[0]
-            print("Mensagem recebida: " + receivedMessage)
+            print("Message from Client: {}".format(receivedMessage))
             address = bytesAddressPair[1]
             self.UDPServerSocket.sendto(bytesToSend, address)
