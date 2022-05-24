@@ -1,13 +1,5 @@
 import threading
 
-def clientThread(client):
-    while True:
-        client.send("Hello!")
-
-def serverThread(server):
-    while True:
-        server.listen("Oh, hey!")
-
 # Essa classe vai gerenciar as duas threads (client e server).
 # Atributos: instâncias de CustomUDPClientSocket e CustomUDPServerSocket.
 
@@ -16,6 +8,14 @@ class SocketThreadManager:
         self.client = client;
         self.server = server
 
+    def __clientThread(self, client):
+        while True:
+            client.send("Hello!")
+
+    def __serverThread(self, server):
+        while True:
+            server.listen("Oh, hey!")
+
     def startThreads(self):
-        threading.Thread(target=clientThread, args=(self.client,)).start()
-        threading.Thread(target=serverThread, args=(self.server,)).start()
+        threading.Thread(target=self.__clientThread, args=(self.client,)).start()
+        threading.Thread(target=self.__serverThread, args=(self.server,)).start()
