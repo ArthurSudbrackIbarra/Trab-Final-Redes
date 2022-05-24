@@ -17,9 +17,12 @@ class ConfigInterpreter:
             elif count == 1:
                 self.nickname = content
             elif count == 2:
-                self.tokenTime = content
+                self.tokenTime = int(content)
             elif count == 3:
-                self.isTokenTrue = content
+                if content == "true":
+                    self.isTokenTrue = True
+                else:
+                    self.isTokenTrue = False
             count += 1
 
     def getNextMachineIP(self):
