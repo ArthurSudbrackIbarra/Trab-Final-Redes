@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from machine import Machine
+from config_interpreter import ConfigInterpreter
 
 def main():
-    machine = Machine("Bob")
-    name = machine.getName()
-    print(name)
+    configInterpreter = ConfigInterpreter("config/config-2.txt")
+    nextMachineIP = configInterpreter.getNextMachineIP()
+    nextMachinePort = configInterpreter.getNextMachinePort()
+    print(nextMachineIP)
+    print(nextMachinePort)
 
 if __name__ == "__main__":
     main()
