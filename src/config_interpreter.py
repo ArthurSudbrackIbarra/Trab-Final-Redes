@@ -4,16 +4,19 @@ import os
 # Interpreta o arquivo de configuração.
 class ConfigInterpreter:
     def __init__(self, filePath):
-        absoluteFilePath = os.path.abspath(filePath)
+        self.filePath = filePath
+    
+    def config(self):
+        absoluteFilePath = os.path.abspath(self.filePath)
         configFile = open(absoluteFilePath, 'r')
         lines = configFile.readlines()
-        # Machine IP
+        configFile.close()
+        # Construindo dicionário:
         splitted = lines[0].strip().split(":")
-        self.nextMachineIP = splitted[0]
-        self.nextMachinePort = splitted[1]
-        # Nickname
-        self.nickname = lines[1].strip();
-        # Token Time
-        self.tokenTime = int(lines[2].strip())
-        # Is Token True
-        self.isTokenTrue = True if lines[3].strip() == "true" else False
+        return {
+            "nextMachineIP": splitted[0],
+            "nextMachinePort": splitted[1],
+            "nickname": lines[1].strip(),
+            "tokenTime": int(lines[2].strip()),
+            "isTokenTrue": True if lines[3].strip() == "true" else False
+        }
