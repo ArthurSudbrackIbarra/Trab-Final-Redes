@@ -15,4 +15,4 @@ class PacketCreator:
         return "1111"
 
     def createDataPacket(self, errorControlType, originNickname, destinationNickname, crc, message):
-        return f"2222;{errorControlType.name}:{originNickname}:{destinationNickname}:{crc}:{message}"
+        return f"2222;{errorControlType.value}:{originNickname}:{destinationNickname}:{crc}:{message}"
