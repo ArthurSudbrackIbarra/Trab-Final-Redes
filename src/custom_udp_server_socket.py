@@ -7,15 +7,14 @@ class CustomUDPServerSocket:
         self.localIP = localIP
         self.localPort = localPort
         self.bufferSize = bufferSize
-
-        self.UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        self.UDPServerSocket.bind((localIP, localPort))
+        self.udpServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.udpServerSocket.bind((localIP, localPort))
 
     def listen(self, message):
         while(True):
             bytesToSend = str.encode(message)
-            bytesAddressPair = self.UDPServerSocket.recvfrom(self.bufferSize)
+            bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
             receivedMessage = bytesAddressPair[0]
             print("Message from Client: {}".format(receivedMessage))
             address = bytesAddressPair[1]
-            self.UDPServerSocket.sendto(bytesToSend, address)
+            self.udpServerSocket.sendto(bytesToSend, address)

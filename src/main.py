@@ -31,7 +31,5 @@ def main():
     print(f"Pacote Token: {tokenPacket}")
     print(f"Pacote Dados: {dataPacket}")
 
-
-
 if __name__ == "__main__":
     main()
