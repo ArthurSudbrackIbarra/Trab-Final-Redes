@@ -5,8 +5,7 @@ from packaging import ErrorControlTypes, TokenPacket, DataPacket, CRC32
 from queue import Queue
 
 
-# Essa classe vai gerenciar as duas threads (client e server).
-# Atributos: instâncias de CustomUDPClientSocket e CustomUDPServerSocket.
+# Essa classe gerencia as threads de cliente e servidor.
 
 
 class SocketThreadManager:
@@ -34,12 +33,16 @@ class SocketThreadManager:
             self.messagesQueue.put(dataPacket.toString())
             # Se estiver com o token, envia primeira mensagem da fila:
             if True:
+                # Enviando pacote de dados, mas pode ser de token!
                 self.client.send(self.messagesQueue.get())
 
     def __serverThread(self) -> None:
         while True:
             message = self.server.listen()
-            print(f"\nMensagem recebida: {message}")
+            # Assumindo que o pacote é de dados, mas pode ser de token!
+            dataPacket = DataPacket.fromString(message)
+            if dataPacket.destinationNickname == self.config["nickname"]:
+                print(f"\nMensagem recebida: {message}")
 
     def startThreads(self) -> None:
         threading.Thread(target=self.__clientThread).start()
