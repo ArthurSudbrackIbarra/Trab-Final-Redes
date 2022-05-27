@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from config_interpreter import ConfigInterpreter
-from custom_udp_client_socket import CustomUDPClientSocket
-from custom_udp_server_socket import CustomUDPServerSocket
-from socket_thread_manager import SocketThreadManager
-from packet_creator import PacketCreator, ErrorControlTypes
+from file_interpreters import ConfigInterpreter
+from custom_sockets import UDPClientSocket, UDPServerSocket
+from thread_managers import SocketThreadManager
+from packaging import ErrorControlTypes, DataPacket, TokenPacket
 
-def main():
+
+def main() -> None:
     # Interpretando o arquivo de configuração.
     configInterpreter = ConfigInterpreter("config/config-2.txt")
     config = configInterpreter.config()
@@ -17,19 +17,22 @@ def main():
     print(config["isTokenTrue"])
 
     # Instanciando sockets.
-    client = CustomUDPClientSocket("127.0.0.1", 9000, 1024)
-    server = CustomUDPServerSocket("127.0.0.1", 9000, 1024)
+    client = UDPClientSocket("127.0.0.1", 9000, 1024)
+    server = UDPServerSocket("127.0.0.1", 9000, 1024)
 
     # Testando threads.
     # threadManager = SocketThreadManager(client, server)
     # threadManager.startThreads()
 
     # Testando criação de pacotes.
-    packetCreator = PacketCreator()
-    tokenPacket = packetCreator.createTokenPacket()
-    dataPacket = packetCreator.createDataPacket(ErrorControlTypes.ACK, "Maria", "Bob", 1000, "Hello!")
-    print(f"Pacote Token: {tokenPacket}")
-    print(f"Pacote Dados: {dataPacket}")
+    dataPacket_1 = DataPacket(ErrorControlTypes.ACK,
+                              "Maria", "Bob", 1000, "Hello!")
+    dataPacket_2 = DataPacket.fromString("2222;NACK:Carlos:Gaspar:3000:Sushi!")
+    tokenPacket = TokenPacket()
+    print(f"Pacote Token: {tokenPacket.toString()}")
+    print(f"Pacote Dados 1: {dataPacket_1.toString()}")
+    print(f"Pacote Dados 2: {dataPacket_2.toString()}")
+
 
 if __name__ == "__main__":
     main()

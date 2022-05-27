@@ -2,11 +2,14 @@
 import os
 
 # Interpreta o arquivo de configuração.
+
+
 class ConfigInterpreter:
-    def __init__(self, filePath):
+    def __init__(self,
+                 filePath: str):
         self.filePath = filePath
-    
-    def config(self):
+
+    def config(self) -> dict[str, ]:
         absoluteFilePath = os.path.abspath(self.filePath)
         configFile = open(absoluteFilePath, 'r')
         lines = configFile.readlines()
