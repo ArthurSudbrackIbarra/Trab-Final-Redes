@@ -1,8 +1,8 @@
-import threading
 from file_interpreters import ConfigInterpreter
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32
 from queue import Queue
+from threading import Thread
 
 
 # Essa classe gerencia as threads de cliente e servidor.
@@ -51,5 +51,5 @@ class SocketThreadManager:
                     print(f"\nPacote recebido: {packetString}")
 
     def startThreads(self) -> None:
-        threading.Thread(target=self.__clientThread).start()
-        threading.Thread(target=self.__serverThread).start()
+        Thread(target=self.__clientThread).start()
+        Thread(target=self.__serverThread).start()
