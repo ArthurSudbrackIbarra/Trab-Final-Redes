@@ -68,14 +68,15 @@ class DataPacket:
 class PacketIdentifier:
     TOKEN = 1
     DATA = 2
+    UNKNOWN = -1
 
     @staticmethod
     def identify(packet: str) -> int:
         if packet.startswith(TokenPacket.CODE):
-            return 1
-        if packet.startswith(DataPacket.CODE):
-            return 2
-        return -1
+            return PacketIdentifier.TOKEN
+        elif packet.startswith(DataPacket.CODE):
+            return PacketIdentifier.DATA
+        return PacketIdentifier.UNKNOWN
 
 
 # Classe para lidar com operações envolvendo CRC32.
