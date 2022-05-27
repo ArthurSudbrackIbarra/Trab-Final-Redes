@@ -1,4 +1,4 @@
-10.32.143.12:6000 // É a próxima máquina.
+10.32.143.12:6000 // É a próxima máquina, junto com a porta.
 Bob // Apelido da máquina à direita.
 1 // Tempo token.
 true // Token. (Gera o token primeiramente ou não?)

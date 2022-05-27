@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+
 import os
+
 
 # Classe do interpretador do arquivo de configuração.
 
