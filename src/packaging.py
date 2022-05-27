@@ -62,6 +62,19 @@ class DataPacket:
         return DataPacket(errorControlType, originNickname, destinationNickname, crc, message)
 
 
+# Classe para identificar pacotes: token ou dados?
+
+
+class PacketIdentifier:
+    @staticmethod
+    def identify(packet: str) -> int:
+        if packet.startswith(TokenPacket.CODE):
+            return 1
+        if packet.startswith(DataPacket.CODE):
+            return 2
+        return -1
+
+
 # Classe para lidar com operações envolvendo CRC32.
 
 

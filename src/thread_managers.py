@@ -1,7 +1,7 @@
 import threading
 from file_interpreters import ConfigInterpreter
 from custom_sockets import UDPClientSocket, UDPServerSocket
-from packaging import ErrorControlTypes, TokenPacket, DataPacket, CRC32
+from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32
 from queue import Queue
 
 
@@ -34,17 +34,21 @@ class SocketThreadManager:
             # Se estiver com o token, envia primeira mensagem da fila:
             hasToken = True  # Mockado.
             if hasToken:
-                # Enviando pacote de dados, mas pode ser de token!
+                # Enviando pacote de dados, mas poderia ser de token (implementar)!
                 if not self.messagesQueue.empty():
                     self.client.send(self.messagesQueue.get())
 
     def __serverThread(self) -> None:
         while True:
-            message = self.server.listen()
-            # Assumindo que o pacote é de dados, mas pode ser de token!
-            dataPacket = DataPacket.fromString(message)
-            if dataPacket.destinationNickname == self.config["nickname"]:
-                print(f"\nMensagem recebida: {message}")
+            packetString = self.server.listen()
+            packetType = PacketIdentifier.identify(packetString)
+            # Token = 1, Dados = 2
+            if packetType == 1:
+                pass
+            elif packetType == 2:
+                dataPacket = DataPacket.fromString(packetString)
+                if dataPacket.destinationNickname == self.config["nickname"]:
+                    print(f"\nPacote recebido: {packetString}")
 
     def startThreads(self) -> None:
         threading.Thread(target=self.__clientThread).start()
