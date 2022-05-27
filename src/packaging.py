@@ -4,10 +4,16 @@ from __future__ import annotations
 import enum
 
 
+# Classe enum com os possíveis tipos de controle de erro.
+
+
 class ErrorControlTypes(enum.Enum):
     MACHINE_DOES_NOT_EXIST = "maquinanaoexiste"
     ACK = "ACK"
     NACK = "NACK"
+
+
+# Classe para representar um pacote de token.
 
 
 class TokenPacket:
@@ -18,6 +24,9 @@ class TokenPacket:
 
     def toString(self) -> str:
         return f"{TokenPacket.CODE}"
+
+
+# Classe para representar um pacote de dados.
 
 
 class DataPacket:
@@ -39,10 +48,10 @@ class DataPacket:
         return f"{DataPacket.CODE};{self.errorControlType.value}:{self.originNickname}:{self.destinationNickname}:{self.crc}:{self.message}"
 
     @staticmethod
-    def fromString(package: str) -> DataPacket:
-        if not package.startswith(f"{DataPacket.CODE};") or len(package) <= 5:
+    def fromString(packet: str) -> DataPacket:
+        if not packet.startswith(f"{DataPacket.CODE};") or len(packet) <= 5:
             return None
-        relevantInfo = package[5:len(package)]
+        relevantInfo = packet[5:len(packet)]
         splitted = relevantInfo.split(":")
         errorControlType = ErrorControlTypes(splitted[0])
         originNickname = splitted[1]

@@ -3,6 +3,8 @@
 
 import socket
 
+# Classe do socket cliente UDP.
+
 
 class UDPClientSocket:
     def __init__(self,
@@ -21,6 +23,8 @@ class UDPClientSocket:
     def receive(self) -> str:
         msgFromServer = self.udpClientSocket.recvfrom(self.bufferSize)
         return msgFromServer[0]
+
+# Classe do socket servidor UDP.
 
 
 class UDPServerSocket:

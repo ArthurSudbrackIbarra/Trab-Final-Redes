@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-# Interpreta o arquivo de configuração.
+# Classe do interpretador do arquivo de configuração.
 
 
 class ConfigInterpreter:
