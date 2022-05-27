@@ -47,7 +47,12 @@ class SocketThreadManager:
             elif packetType == PacketIdentifier.DATA:
                 dataPacket = DataPacket.fromString(packetString)
                 if dataPacket.destinationNickname == self.config["nickname"]:
-                    print(f"\nPacote recebido: {packetString}")
+                    # TODO: Calcular o CRC
+                    print(
+                        f"\n[Pacote recebido]\n\nMensagem: {dataPacket.message}\nApelido da origem: {dataPacket.originNickname}\n")
+                else:
+                    # Verificar se isso está certo.
+                    self.messagesQueue.put(packetString)
 
     def startThreads(self) -> None:
         Thread(target=self.__clientThread).start()
