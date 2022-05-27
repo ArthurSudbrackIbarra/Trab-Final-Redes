@@ -7,7 +7,7 @@ import socket
 class UDPClientSocket:
     def __init__(self,
                  serverAddress: str,
-                 serverPort: str,
+                 serverPort: int,
                  bufferSize: int):
         self.serverAddressPort = (serverAddress, serverPort)
         self.bufferSize = bufferSize
@@ -26,7 +26,7 @@ class UDPClientSocket:
 class UDPServerSocket:
     def __init__(self,
                  localIP: str,
-                 localPort: str,
+                 localPort: int,
                  bufferSize: int):
         self.localIP = localIP
         self.localPort = localPort
