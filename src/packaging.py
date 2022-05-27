@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import enum
+import zlib
 
 
 # Classe enum com os possíveis tipos de controle de erro.
@@ -59,3 +60,17 @@ class DataPacket:
         crc = int(splitted[3])
         message = splitted[4]
         return DataPacket(errorControlType, originNickname, destinationNickname, crc, message)
+
+
+# Classe para lidar com operações envolvendo CRC32.
+
+
+class CRC32:
+    @staticmethod
+    def calculate(packet: DataPacket) -> int:
+        encodedBytes = str.encode(packet.toString())
+        return zlib.crc32(encodedBytes)
+
+    @staticmethod
+    def check(packet: DataPacket, crc: int) -> bool:
+        return CRC32.calculate(packet) == crc

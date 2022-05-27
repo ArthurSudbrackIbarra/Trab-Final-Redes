@@ -22,7 +22,7 @@ class UDPClientSocket:
 
     def receive(self) -> str:
         msgFromServer = self.udpClientSocket.recvfrom(self.bufferSize)
-        return msgFromServer[0]
+        return msgFromServer[0].decode()
 
 # Classe do socket servidor UDP.
 
@@ -43,7 +43,7 @@ class UDPServerSocket:
         while(True):
             bytesToSend = str.encode(message)
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
-            receivedMessage = bytesAddressPair[0]
-            print("Message from Client: {}".format(receivedMessage))
+            receivedMessage = bytesAddressPair[0].decode()
+            print(f"Message from Client: {receivedMessage}")
             address = bytesAddressPair[1]
             self.udpServerSocket.sendto(bytesToSend, address)
