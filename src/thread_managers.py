@@ -32,9 +32,11 @@ class SocketThreadManager:
             # ! Falta colocar o CRC !
             self.messagesQueue.put(dataPacket.toString())
             # Se estiver com o token, envia primeira mensagem da fila:
-            if True:
+            hasToken = True  # Mockado.
+            if hasToken:
                 # Enviando pacote de dados, mas pode ser de token!
-                self.client.send(self.messagesQueue.get())
+                if not self.messagesQueue.empty():
+                    self.client.send(self.messagesQueue.get())
 
     def __serverThread(self) -> None:
         while True:
