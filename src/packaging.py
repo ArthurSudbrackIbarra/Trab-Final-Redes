@@ -66,6 +66,9 @@ class DataPacket:
 
 
 class PacketIdentifier:
+    TOKEN = 1
+    DATA = 2
+
     @staticmethod
     def identify(packet: str) -> int:
         if packet.startswith(TokenPacket.CODE):

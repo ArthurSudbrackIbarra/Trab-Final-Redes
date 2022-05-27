@@ -42,10 +42,9 @@ class SocketThreadManager:
         while True:
             packetString = self.server.listen()
             packetType = PacketIdentifier.identify(packetString)
-            # Token = 1, Dados = 2
-            if packetType == 1:
+            if packetType == PacketIdentifier.TOKEN:
                 pass
-            elif packetType == 2:
+            elif packetType == PacketIdentifier.DATA:
                 dataPacket = DataPacket.fromString(packetString)
                 if dataPacket.destinationNickname == self.config["nickname"]:
                     print(f"\nPacote recebido: {packetString}")
