@@ -16,7 +16,7 @@ def main() -> None:
     print(f"Deve gerar token: {config['isTokenTrue']}")
 
     # Iniciando threads.
-    threadManager = SocketThreadManager(config)
+    threadManager = SocketThreadManager(configInterpreter)
     threadManager.startThreads()
 
 

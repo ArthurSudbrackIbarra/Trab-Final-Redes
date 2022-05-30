@@ -10,18 +10,18 @@ from threading import Thread
 
 
 class SocketThreadManager:
-    def __init__(self, config: ConfigInterpreter):
-        self.config = config
+    def __init__(self, configInterpreter: ConfigInterpreter):
+        self.config = configInterpreter.config()
         self.client = UDPClientSocket(
-            serverAddress=config["nextMachineIP"],
-            serverPort=int(config["nextMachinePort"]),
+            serverAddress=self.config["nextMachineIP"],
+            serverPort=int(self.config["nextMachinePort"]),
             bufferSize=1024
         )
         self.server = UDPServerSocket(
             port=9000,
             bufferSize=1024
         )
-        self.token = TokenPacket() if config["isTokenTrue"] else None
+        self.token = TokenPacket() if self.config["isTokenTrue"] else None
         self.waiting = False if self.token is not None else True
         self.messagesQueue = Queue()
 
