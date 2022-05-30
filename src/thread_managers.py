@@ -5,7 +5,7 @@ from queue import Queue
 from threading import Thread
 
 
-# Essa classe gerencia as threads de cliente e servidor.
+# Essa classe gerencia duas threads: a de sockets e a de recebimento de input.
 
 
 class SocketThreadManager:
@@ -77,9 +77,5 @@ class SocketThreadManager:
             self.messagesQueue.put(dataPacket.toString())
 
     def startThreads(self) -> None:
-        socketsThread = Thread(
-            target=self.__socketsThread, name="Sockets Thread")
-        inputThread = Thread(
-            target=self.__inputThread, name="Input Thread")
-        socketsThread.start()
-        inputThread.start()
+        Thread(target=self.__socketsThread, name="Sockets Thread").start()
+        Thread(target=self.__inputThread, name="Input Thread").start()
