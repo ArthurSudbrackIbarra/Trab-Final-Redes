@@ -11,7 +11,7 @@ class ConfigInterpreter:
                  filePath: str):
         self.filePath = filePath
 
-    def config(self) -> dict[str, ]:
+    def config(self) -> "dict[str, ]":
         absoluteFilePath = os.path.abspath(self.filePath)
         configFile = open(absoluteFilePath, 'r')
         lines = configFile.readlines()

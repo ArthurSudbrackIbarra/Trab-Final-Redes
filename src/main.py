@@ -23,7 +23,7 @@ def main() -> None:
 
     # Testando criação de pacotes.
     dataPacket_1 = DataPacket(ErrorControlTypes.ACK,
-                              "Maria", "Bob", 1000, "Hello!")
+                              "Maria", "Bob", 2636827734, "Hello!")
     dataPacket_2 = DataPacket.fromString("2222;NACK:Carlos:Gaspar:3000:Sushi!")
     tokenPacket = TokenPacket()
     print(f"\nPacote Token: {tokenPacket.toString()}")
@@ -31,10 +31,10 @@ def main() -> None:
     print(f"Pacote Dados 2: {dataPacket_2.toString()}")
 
     # Testando CRC32.
-    crc_1 = CRC32.calculate(dataPacket_1)
-    crc_2 = CRC32.calculate(dataPacket_2)
-    check_1 = CRC32.check(dataPacket_1, crc_1)
-    check_2 = CRC32.check(dataPacket_2, crc_2)
+    crc_1 = CRC32.calculate(dataPacket_1.message)
+    crc_2 = CRC32.calculate(dataPacket_2.message)
+    check_1 = CRC32.check(dataPacket_1)
+    check_2 = CRC32.check(dataPacket_2)
     print(f"\nCRC do pacote de dados 1: {crc_1}")
     print(f"CRC do pacote 1 bate? {check_1}")
     print(f"CRC do pacote de dados 2: {crc_2}")

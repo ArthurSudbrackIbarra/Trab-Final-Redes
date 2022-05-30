@@ -36,7 +36,7 @@ class UDPServerSocket:
             family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.udpServerSocket.bind((localIP, localPort))
 
-    def listen(self) -> str:
+    def receive(self) -> str:
         while(True):
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
             return bytesAddressPair[0].decode()
