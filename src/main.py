@@ -3,10 +3,18 @@
 from configurations import ConfigInterpreter
 from thread_managers import SocketThreadManager
 
+import sys
+
 
 def main() -> None:
+    filePath = "config/config-1.txt"
+    serverSocketPort = 9000
+    if len(sys.argv) > 1:
+        filePath = sys.argv[1]
+        serverSocketPort = int(sys.argv[2])
+
     # Interpretando o arquivo de configuração.
-    configInterpreter = ConfigInterpreter("src/config/config-2.txt")
+    configInterpreter = ConfigInterpreter(filePath)
     config = configInterpreter.config()
     print("\n[Arquivo de configuração]\n")
     print(f"IP da máquina à direita: {config.nextMachineIP}")
@@ -16,7 +24,8 @@ def main() -> None:
     print(f"Deve gerar token: {config.isTokenTrue}")
 
     # Iniciando threads.
-    threadManager = SocketThreadManager(config)
+    threadManager = SocketThreadManager(
+        config=config, serverSocketPort=serverSocketPort)
     threadManager.startThreads()
 
 

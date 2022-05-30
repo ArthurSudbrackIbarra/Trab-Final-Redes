@@ -10,7 +10,8 @@ from threading import Thread
 
 class SocketThreadManager:
     def __init__(self,
-                 config: Configuration):
+                 config: Configuration,
+                 serverSocketPort: int = 9000):
         self.config = config
         self.client = UDPClientSocket(
             serverAddress=config.nextMachineIP,
@@ -18,7 +19,7 @@ class SocketThreadManager:
             bufferSize=1024
         )
         self.server = UDPServerSocket(
-            port=9000,
+            port=serverSocketPort,
             bufferSize=1024
         )
         self.token = TokenPacket() if config.isTokenTrue else None

@@ -29,9 +29,7 @@ class ConfigInterpreter:
         configFile = open(absoluteFilePath, 'r')
         lines = configFile.readlines()
         configFile.close()
-        # Construindo dicionário:
         splitted = lines[0].strip().split(":")
-        print(splitted[1])
         configuration = Configuration(
             nextMachineIP=splitted[0],
             nextMachinePort=int(splitted[1]),
