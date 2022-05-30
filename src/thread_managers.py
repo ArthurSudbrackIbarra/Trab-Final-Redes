@@ -1,4 +1,3 @@
-from calendar import c
 from file_interpreters import ConfigInterpreter
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32
