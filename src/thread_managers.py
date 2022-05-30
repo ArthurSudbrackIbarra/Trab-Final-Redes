@@ -19,15 +19,19 @@ class SocketThreadManager:
         self.server = server
         self.token = TokenPacket() if config["isTokenTrue"] else None
         self.messagesQueue = Queue()
+        self.waiting = False if self.token else True
 
     def __socketsThread(self) -> None:
         while True:
             # Tenho o token:
             if self.token is not None:
-                if self.messagesQueue.empty():
+                if self.messagesQueue.empty() and not self.waiting:
                     self.client.send(self.token.toString())
-                else:
+                    self.token = None
+                    self.waiting = True
+                elif not self.waiting:
                     self.client.send(self.messagesQueue.get())
+                    self.waiting = True
             # Não tenho o token:
             else:
                 packetString = self.server.receive()
@@ -35,6 +39,7 @@ class SocketThreadManager:
                 # Recebi token:
                 if packetType == PacketIdentifier.TOKEN:
                     self.token = TokenPacket()
+                    self.waiting = False
                     continue
                 # Recebi dados:
                 elif packetType == PacketIdentifier.DATA:
@@ -50,6 +55,7 @@ class SocketThreadManager:
                                 f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate. Descartando pacote...")
                     # Sou a origem:
                     elif dataPacket.originNickname == self.config["nickname"]:
+                        self.waiting = False
                         # Verificar controle de erro...
                         pass
                     else:
@@ -57,8 +63,10 @@ class SocketThreadManager:
 
     def __inputThread(self) -> None:
         while True:
-            message = input("\nMensagem a ser enviada: ")
-            destinationNickname = input("Apelido do destino: ")
+            # message = input("\nMensagem a ser enviada: ")
+            # destinationNickname = input("Apelido do destino: ")
+            message = "Hello!"
+            destinationNickname = "Bob"
             crc = CRC32.calculate(message)
             dataPacket = DataPacket(
                 ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
