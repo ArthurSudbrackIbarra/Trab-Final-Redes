@@ -1,4 +1,4 @@
-from file_interpreters import ConfigInterpreter
+from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32
 from queue import Queue
@@ -9,18 +9,19 @@ from threading import Thread
 
 
 class SocketThreadManager:
-    def __init__(self, configInterpreter: ConfigInterpreter):
-        self.config = configInterpreter.config()
+    def __init__(self,
+                 config: Configuration):
+        self.config = config
         self.client = UDPClientSocket(
-            serverAddress=self.config["nextMachineIP"],
-            serverPort=int(self.config["nextMachinePort"]),
+            serverAddress=config.nextMachineIP,
+            serverPort=config.nextMachinePort,
             bufferSize=1024
         )
         self.server = UDPServerSocket(
             port=9000,
             bufferSize=1024
         )
-        self.token = TokenPacket() if self.config["isTokenTrue"] else None
+        self.token = TokenPacket() if config.isTokenTrue else None
         self.waiting = False if self.token is not None else True
         self.messagesQueue = Queue()
 
@@ -46,7 +47,7 @@ class SocketThreadManager:
             elif packetType == PacketIdentifier.DATA:
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
-                if dataPacket.destinationNickname == self.config["nickname"]:
+                if dataPacket.destinationNickname == self.config.nickname:
                     isCRCCorrect = CRC32.check(dataPacket)
                     if isCRCCorrect:
                         print(
@@ -55,7 +56,7 @@ class SocketThreadManager:
                         print(
                             f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate. Descartando pacote...")
                 # Sou a origem:
-                elif dataPacket.originNickname == self.config["nickname"]:
+                elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
                     # Verificar controle de erro...
                     pass
@@ -69,7 +70,7 @@ class SocketThreadManager:
             crc = CRC32.calculate(message)
             dataPacket = DataPacket(
                 ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
-                self.config["nickname"],
+                self.config.nickname,
                 destinationNickname,
                 crc,
                 message
