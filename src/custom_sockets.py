@@ -26,15 +26,13 @@ class UDPClientSocket:
 
 class UDPServerSocket:
     def __init__(self,
-                 localIP: str,
-                 localPort: int,
+                 port: int,
                  bufferSize: int):
-        self.localIP = localIP
-        self.localPort = localPort
+        self.port = port
         self.bufferSize = bufferSize
         self.udpServerSocket = socket.socket(
             family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        self.udpServerSocket.bind((localIP, localPort))
+        self.udpServerSocket.bind(("", port))
 
     def receive(self) -> str:
         while(True):

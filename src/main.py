@@ -8,7 +8,7 @@ from packaging import ErrorControlTypes, TokenPacket, DataPacket, CRC32
 
 def main() -> None:
     # Interpretando o arquivo de configuração.
-    configInterpreter = ConfigInterpreter("config/config-2.txt")
+    configInterpreter = ConfigInterpreter("src/config/config-2.txt")
     config = configInterpreter.config()
     print("\n[Arquivo de configuração]\n")
     print(f"IP da máquina à direita: {config['nextMachineIP']}")
@@ -19,7 +19,7 @@ def main() -> None:
 
     # Instanciando sockets.
     client = UDPClientSocket("127.0.0.1", 9000, 1024)
-    server = UDPServerSocket("127.0.0.1", 9000, 1024)
+    server = UDPServerSocket(9000, 1024)
 
     # Testando criação de pacotes.
     dataPacket_1 = DataPacket(ErrorControlTypes.ACK,
