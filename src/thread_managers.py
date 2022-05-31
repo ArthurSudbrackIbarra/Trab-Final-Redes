@@ -41,11 +41,13 @@ class SocketThreadManager:
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
             if packetType == PacketIdentifier.TOKEN:
+                # print(f"Recebi Token! {packetString}")
                 self.token = TokenPacket()
                 self.waiting = False
                 continue
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
+                print(f"Recebi Dados! {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
                 if dataPacket.destinationNickname == self.config.nickname:
@@ -56,10 +58,18 @@ class SocketThreadManager:
                     else:
                         print(
                             f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate. Descartando pacote...")
+                    if self.token is not None:
+                        self.client.send(self.token.toString())
+                        self.token = None
+                    else:
+                        self.client.send(packetString)
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
                     # Verificar controle de erro...
+
+                    self.client.send(self.token.toString())
+                    self.token = None
                     pass
                 else:
                     self.client.send(packetString)
