@@ -3,6 +3,7 @@
 from __future__ import annotations
 import enum
 import zlib
+import random
 
 
 # Classe enum com os possíveis tipos de controle de erro.
@@ -91,3 +92,17 @@ class CRC32:
     @staticmethod
     def check(packet: DataPacket) -> bool:
         return CRC32.calculate(packet.message) == packet.crc
+
+
+# Classe para inserir falhas de propósito nos pacotes.
+
+
+class PacketFaultInserter:
+    def __init__(self,
+                 percentage: float):
+        self.percentage = percentage
+
+    def tryInsert(self, packet: DataPacket) -> None:
+        numberGenerated = random.random()
+        if numberGenerated <= self.percentage / 100:
+            packet.crc = -9999

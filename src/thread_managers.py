@@ -1,7 +1,7 @@
 import time
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
-from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32
+from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
 from queue import Queue
 from threading import Thread
 
@@ -86,6 +86,8 @@ class SocketThreadManager:
                     self.client.send(packetString)
 
     def __inputThread(self) -> None:
+        # 20% dos pacotes serão enviados com erros propositais.
+        faultInserter = PacketFaultInserter(20.0)
         while True:
             userInput = input("\nMensagem a ser enviada: ")
             splitted = userInput.split(" -> ")
@@ -100,6 +102,7 @@ class SocketThreadManager:
                     crc,
                     message
                 )
+                faultInserter.tryInsert(dataPacket)
                 self.messagesQueue.put(dataPacket.toString())
 
     def startThreads(self) -> None:
