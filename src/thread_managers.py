@@ -2,7 +2,7 @@ import time
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
-from queue import Queue
+from collections import deque
 from threading import Thread
 
 
@@ -25,18 +25,18 @@ class SocketThreadManager:
         )
         self.token = TokenPacket() if config.isTokenTrue else None
         self.waiting = False if self.token is not None else True
-        self.messagesQueue = Queue()
+        self.messagesQueue = deque()
 
     def __socketsThread(self) -> None:
         while True:
             # Se tenho o token:
             if self.token is not None:
-                if self.messagesQueue.empty() and not self.waiting:
+                if len(self.messagesQueue) == 0 and not self.waiting:
                     self.client.send(self.token.toString())
                     self.token = None
                     self.waiting = True
                 elif not self.waiting:
-                    self.client.send(self.messagesQueue.get())
+                    self.client.send(self.messagesQueue.popleft())
                     self.waiting = True
             packetString = self.server.receive()
             packetType = PacketIdentifier.identify(packetString)
@@ -60,7 +60,7 @@ class SocketThreadManager:
                         dataPacket.errorControlType = ErrorControlTypes.ACK
                     else:
                         print(
-                            f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate. Descartando pacote...")
+                            f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
                     if self.token is not None:
                         self.client.send(self.token.toString())
@@ -70,17 +70,13 @@ class SocketThreadManager:
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
-                    # Verificar controle de erro...
-                    if dataPacket.errorControlType == ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
-                        pass
-                    elif dataPacket.errorControlType == ErrorControlTypes.ACK:
-                        pass
-                    elif dataPacket.errorControlType == ErrorControlTypes.NACK:
-                        pass
-                    # Ver o que fazer aqui...
+                    if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
+                        print(
+                            f"\nA mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino {dataPacket.destinationNickname} não se encontra na rede.\n")
+                    elif dataPacket.errorControlType is ErrorControlTypes.NACK:
+                        self.messagesQueue.appendleft(dataPacket.toString())
                     self.client.send(self.token.toString())
                     self.token = None
-                    pass
                 # Não sou a origem nem o destino:
                 else:
                     self.client.send(packetString)
@@ -103,7 +99,7 @@ class SocketThreadManager:
                     message
                 )
                 faultInserter.tryInsert(dataPacket)
-                self.messagesQueue.put(dataPacket.toString())
+                self.messagesQueue.append(dataPacket.toString())
 
     def startThreads(self) -> None:
         Thread(target=self.__socketsThread, name="Sockets Thread").start()
