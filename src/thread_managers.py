@@ -87,17 +87,20 @@ class SocketThreadManager:
 
     def __inputThread(self) -> None:
         while True:
-            message = input("\nMensagem a ser enviada: ")
-            destinationNickname = input("Apelido do destino: ")
-            crc = CRC32.calculate(message)
-            dataPacket = DataPacket(
-                ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
-                self.config.nickname,
-                destinationNickname,
-                crc,
-                message
-            )
-            self.messagesQueue.put(dataPacket.toString())
+            userInput = input("\nMensagem a ser enviada: ")
+            splitted = userInput.split(" -> ")
+            if len(splitted) >= 2:
+                message = splitted[0]
+                destinationNickname = splitted[1]
+                crc = CRC32.calculate(message)
+                dataPacket = DataPacket(
+                    ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
+                    self.config.nickname,
+                    destinationNickname,
+                    crc,
+                    message
+                )
+                self.messagesQueue.put(dataPacket.toString())
 
     def startThreads(self) -> None:
         Thread(target=self.__socketsThread, name="Sockets Thread").start()

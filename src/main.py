@@ -23,6 +23,10 @@ def main() -> None:
     print(f"Tempo do token: {config.tokenTime}")
     print(f"Deve gerar token: {config.isTokenTrue}")
 
+    print(
+        "\nPara enviar pacotes, digite {sua mensagem} -> {apelido do destino}.")
+    print("Exemplo: Oi!! -> Maria\n")
+
     # Iniciando threads.
     threadManager = SocketThreadManager(
         config=config, serverSocketPort=serverSocketPort)
