@@ -1,3 +1,4 @@
+import time
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32
@@ -41,13 +42,14 @@ class SocketThreadManager:
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
             if packetType == PacketIdentifier.TOKEN:
-                # print(f"Recebi Token! {packetString}")
+                print(f"\nRecebi Token: {packetString}\n")
                 self.token = TokenPacket()
                 self.waiting = False
+                time.sleep(self.config.tokenTime)
                 continue
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
-                print(f"Recebi Dados! {packetString}")
+                print(f"\nRecebi Dados: {packetString}\n")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
                 if dataPacket.destinationNickname == self.config.nickname:
@@ -55,9 +57,11 @@ class SocketThreadManager:
                     if isCRCCorrect:
                         print(
                             f"\n[Pacote recebido]\n\nMensagem: {dataPacket.message}\nApelido da origem: {dataPacket.originNickname}\n")
+                        dataPacket.errorControlType = ErrorControlTypes.ACK
                     else:
                         print(
                             f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate. Descartando pacote...")
+                        dataPacket.errorControlType = ErrorControlTypes.NACK
                     if self.token is not None:
                         self.client.send(self.token.toString())
                         self.token = None
@@ -67,10 +71,17 @@ class SocketThreadManager:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
                     # Verificar controle de erro...
-
+                    if dataPacket.errorControlType == ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
+                        pass
+                    elif dataPacket.errorControlType == ErrorControlTypes.ACK:
+                        pass
+                    elif dataPacket.errorControlType == ErrorControlTypes.NACK:
+                        pass
+                    # Ver o que fazer aqui...
                     self.client.send(self.token.toString())
                     self.token = None
                     pass
+                # Não sou a origem nem o destino:
                 else:
                     self.client.send(packetString)
 
