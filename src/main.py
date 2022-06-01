@@ -27,6 +27,8 @@ def main() -> None:
     print(
         f"\nPara enviar pacotes, escreva na última linha do arquivo {Colors.OKBLUE}messages/inputs.txt{Colors.ENDC} [sua mensagem] -> [apelido do destino]. Após isso, SALVE O ARQUIVO.")
     print("Exemplo: Oi -> Maria\n")
+    print("=" * 100)
+    input("\nPressione enter para continuar...")
 
     # Iniciando threads.
     threadManager = SocketThreadManager(
