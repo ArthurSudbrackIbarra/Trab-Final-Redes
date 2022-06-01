@@ -84,7 +84,6 @@ class SocketThreadManager:
                 else:
                     self.client.send(packetString)
 
-    # TODO: Escrever as mensagens num arquivo e ficar lendo esse arquivo toda hora:
     def __inputThread(self) -> None:
         # 20% dos pacotes serão enviados com erros propositais.
         faultInserter = PacketFaultInserter(20.0)
@@ -95,10 +94,11 @@ class SocketThreadManager:
         while True:
             userInput = ""
             with open(absoluteFilePath) as inputsFile:
-                # Última linha:
                 lines = inputsFile.readlines()
                 if len(lines) > 0:
+                    # Última linha:
                     userInput = lines[-1]
+            # Se tem input e não é o mesmo de antes:
             if userInput != "" and userInput != lastUserInput:
                 splitted = userInput.split(" -> ")
                 if len(splitted) >= 2:
