@@ -66,6 +66,7 @@ class SocketThreadManager:
                         print(
                             f"{Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
+                    # Verificar se of if-else de baixo está certo!
                     if self.token is not None:
                         print(
                             f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
@@ -81,7 +82,12 @@ class SocketThreadManager:
                     if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
                         print(
                             f"{Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.")
+                    elif dataPacket.errorControlType is ErrorControlTypes.ACK:
+                        print(
+                            f"{Colors.OKGREEN}[ACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - o recebimento do pacote foi confirmado.")
                     elif dataPacket.errorControlType is ErrorControlTypes.NACK:
+                        print(
+                            f"{Colors.FAIL}[NACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
                         self.messagesQueue.appendleft(dataPacket.toString())
                     print(
                         f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
