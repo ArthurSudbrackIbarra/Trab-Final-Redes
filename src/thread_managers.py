@@ -2,6 +2,7 @@ import time
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
+from coloring import Colors
 from collections import deque
 from threading import Thread
 
@@ -42,25 +43,26 @@ class SocketThreadManager:
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
             if packetType == PacketIdentifier.TOKEN:
-                print(f"\nRecebi Token: {packetString}\n")
+                print(
+                    f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 self.token = TokenPacket()
                 self.waiting = False
                 time.sleep(self.config.tokenTime)
                 continue
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
-                print(f"\nRecebi Dados: {packetString}\n")
+                print(f"\nRecebi Dados: {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
                 if dataPacket.destinationNickname == self.config.nickname:
                     isCRCCorrect = CRC32.check(dataPacket)
                     if isCRCCorrect:
                         print(
-                            f"\n[Pacote recebido]\n\nMensagem: {dataPacket.message}\nApelido da origem: {dataPacket.originNickname}\n")
+                            f"{Colors.OKGREEN}[ACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, Mensagem: {dataPacket.message}\n")
                         dataPacket.errorControlType = ErrorControlTypes.ACK
                     else:
                         print(
-                            f"Pacote recebido de {dataPacket.originNickname}, porém o CRC não bate.")
+                            f"{Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
                     if self.token is not None:
                         self.client.send(self.token.toString())
@@ -72,7 +74,7 @@ class SocketThreadManager:
                     self.waiting = False
                     if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
                         print(
-                            f"\nA mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino {dataPacket.destinationNickname} não se encontra na rede.\n")
+                            f"{Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.\n")
                     elif dataPacket.errorControlType is ErrorControlTypes.NACK:
                         self.messagesQueue.appendleft(dataPacket.toString())
                     self.client.send(self.token.toString())
@@ -81,11 +83,12 @@ class SocketThreadManager:
                 else:
                     self.client.send(packetString)
 
+    # TODO: Escrever as mensagens num arquivo e ficar lendo esse arquivo toda hora:
     def __inputThread(self) -> None:
         # 20% dos pacotes serão enviados com erros propositais.
         faultInserter = PacketFaultInserter(20.0)
         while True:
-            userInput = input("\nMensagem a ser enviada: ")
+            userInput = input()
             splitted = userInput.split(" -> ")
             if len(splitted) >= 2:
                 message = splitted[0]

@@ -7,7 +7,7 @@ import sys
 
 
 def main() -> None:
-    filePath = "src/config/config-4.txt"
+    filePath = "config/config-1.txt"
     serverSocketPort = 9000
     if len(sys.argv) > 1:
         filePath = sys.argv[1]
