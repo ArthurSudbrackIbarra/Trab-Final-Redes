@@ -26,7 +26,6 @@ class SocketThreadManager:
             bufferSize=1024
         )
         self.token = TokenPacket() if config.isTokenTrue else None
-        self.waiting = False if self.token is not None else True
         self.messagesQueue = deque()
         self.receivedNACK = False
 
@@ -34,13 +33,13 @@ class SocketThreadManager:
         while True:
             # Se tenho o token:
             if self.token is not None:
-                if len(self.messagesQueue) == 0 and not self.waiting:
+                if len(self.messagesQueue) == 0:
                     self.client.send(self.token.toString())
                     self.token = None
-                    self.waiting = True
-                elif not self.waiting:
-                    self.client.send(self.messagesQueue.popleft())
-                    self.waiting = True
+                else:
+                    nextMessage = self.messagesQueue.popleft()
+                    print(f"\nEnviando próxima mensagem da fila: '{nextMessage}'")
+                    self.client.send(nextMessage)
             packetString = self.server.receive()
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
@@ -48,12 +47,11 @@ class SocketThreadManager:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 self.token = TokenPacket()
-                self.waiting = False
                 time.sleep(self.config.tokenTime)
                 continue
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
-                print("\n", "-" * 100)
+                print("\n" + ("-" * 100))
                 print(f"Recebi Dados: {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
@@ -61,26 +59,25 @@ class SocketThreadManager:
                     isCRCCorrect = CRC32.check(dataPacket)
                     if isCRCCorrect:
                         print(
-                            f"{Colors.OKGREEN}[ACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, Mensagem: {dataPacket.message}")
+                            f"Retornando {Colors.OKGREEN}[ACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, Mensagem: {dataPacket.message}")
                         dataPacket.errorControlType = ErrorControlTypes.ACK
                     else:
                         print(
-                            f"{Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
+                            f"Retornando {Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
                     self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
-                    self.waiting = False
                     if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
                         print(
-                            f"{Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.")
+                            f"Recebi {Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.")
                     elif dataPacket.errorControlType is ErrorControlTypes.ACK:
                         print(
-                            f"{Colors.OKGREEN}[ACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - o recebimento do pacote foi confirmado.")
+                            f"Recebi {Colors.OKGREEN}[ACK]{Colors.ENDC} para a mensagem '{dataPacket.message}' - o recebimento do pacote foi confirmado.")
                     elif dataPacket.errorControlType is ErrorControlTypes.NACK:
                         if not self.receivedNACK:
                             print(
-                                f"{Colors.FAIL}[NACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
+                                f"Recebi {Colors.FAIL}[NACK]{Colors.ENDC} para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
                             self.receivedNACK = True
                             self.messagesQueue.appendleft(dataPacket.toString())
                         else:
@@ -127,7 +124,7 @@ class SocketThreadManager:
                     faultInserter.tryInsert(dataPacket)
                     self.messagesQueue.append(dataPacket.toString())
                     print(
-                        f"\nMensagem {Colors.OKCYAN}'{message}'{Colors.ENDC} para {Colors.OKCYAN}'{destinationNickname}'{Colors.ENDC} colocada na fila!\n")
+                        f"\nMensagem {Colors.OKCYAN}'{message}'{Colors.ENDC} para {Colors.OKCYAN}'{destinationNickname}'{Colors.ENDC} colocada na fila!")
                     lastUserInput = userInput
 
     def startThreads(self) -> None:
