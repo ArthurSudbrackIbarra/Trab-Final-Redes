@@ -52,7 +52,8 @@ class SocketThreadManager:
                 continue
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
-                print(f"\nRecebi Dados: {packetString}")
+                print("-" * 100)
+                print(f"Recebi Dados: {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
                 if dataPacket.destinationNickname == self.config.nickname:
@@ -89,6 +90,7 @@ class SocketThreadManager:
                 # Não sou a origem nem o destino:
                 else:
                     self.client.send(packetString)
+                print("-" * 100)
 
     def __inputThread(self) -> None:
         # 20% dos pacotes serão enviados com erros propositais.
@@ -120,6 +122,8 @@ class SocketThreadManager:
                     )
                     faultInserter.tryInsert(dataPacket)
                     self.messagesQueue.append(dataPacket.toString())
+                    print(
+                        f"\nMensagem {Colors.OKCYAN}'{message}'{Colors.ENDC} para {Colors.OKCYAN}'{destinationNickname}'{Colors.ENDC} colocada na fila!\n")
                     lastUserInput = userInput
 
     def startThreads(self) -> None:

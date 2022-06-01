@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from configurations import ConfigInterpreter
 from coloring import Colors
 from thread_managers import SocketThreadManager
-
-import sys
 
 
 def main() -> None:
