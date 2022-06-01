@@ -28,6 +28,7 @@ class SocketThreadManager:
         self.token = TokenPacket() if config.isTokenTrue else None
         self.waiting = False if self.token is not None else True
         self.messagesQueue = deque()
+        self.receivedNACK = False
 
     def __socketsThread(self) -> None:
         while True:
@@ -52,7 +53,7 @@ class SocketThreadManager:
                 continue
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
-                print("-" * 100)
+                print("\n", "-" * 100)
                 print(f"Recebi Dados: {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
@@ -66,16 +67,7 @@ class SocketThreadManager:
                         print(
                             f"{Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
-                    # Verificar se of if-else de baixo está certo!
-                    if self.token is not None:
-                        print(
-                            f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                        self.client.send(self.token.toString())
-                        self.token = None
-                    else:
-                        print(
-                            f"Enviando dados [{dataPacket.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                        self.client.send(dataPacket.toString())
+                    self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
@@ -86,9 +78,15 @@ class SocketThreadManager:
                         print(
                             f"{Colors.OKGREEN}[ACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - o recebimento do pacote foi confirmado.")
                     elif dataPacket.errorControlType is ErrorControlTypes.NACK:
-                        print(
-                            f"{Colors.FAIL}[NACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
-                        self.messagesQueue.appendleft(dataPacket.toString())
+                        if not self.receivedNACK:
+                            print(
+                                f"{Colors.FAIL}[NACK]{Colors.ENDC} recebido para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
+                            self.receivedNACK = True
+                            self.messagesQueue.appendleft(dataPacket.toString())
+                        else:
+                            print(
+                                f"Mesmo após o reenvio do pacote, um {Colors.FAIL}[NACK]{Colors.ENDC} foi recebido novamente. O pacote não será adicionado na fila novamente.")
+                            self.receivedNACK = False
                     print(
                         f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                     self.client.send(self.token.toString())
