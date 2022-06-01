@@ -72,8 +72,8 @@ class SocketThreadManager:
                         self.token = None
                     else:
                         print(
-                            f"Enviando dados [{dataPacket}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                        self.client.send(packetString)
+                            f"Enviando dados [{dataPacket.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
+                        self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
