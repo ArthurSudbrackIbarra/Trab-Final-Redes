@@ -25,7 +25,7 @@ def main() -> None:
     print(f"Deve gerar token: {config.isTokenTrue}")
 
     print(
-        f"\nPara enviar pacotes, escreva na última linha do arquivo {Colors.OKCYAN}messages/inputs.txt{Colors.ENDC} [sua mensagem] -> [apelido do destino].")
+        f"\nPara enviar pacotes, escreva na última linha do arquivo {Colors.OKBLUE}messages/inputs.txt{Colors.ENDC} [sua mensagem] -> [apelido do destino]. Após isso, SALVE O ARQUIVO.")
     print("Exemplo: Oi -> Maria\n")
 
     # Iniciando threads.

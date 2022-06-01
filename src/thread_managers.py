@@ -59,25 +59,31 @@ class SocketThreadManager:
                     isCRCCorrect = CRC32.check(dataPacket)
                     if isCRCCorrect:
                         print(
-                            f"{Colors.OKGREEN}[ACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, Mensagem: {dataPacket.message}\n")
+                            f"{Colors.OKGREEN}[ACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, Mensagem: {dataPacket.message}")
                         dataPacket.errorControlType = ErrorControlTypes.ACK
                     else:
                         print(
                             f"{Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
                     if self.token is not None:
+                        print(
+                            f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                         self.client.send(self.token.toString())
                         self.token = None
                     else:
+                        print(
+                            f"Enviando dados [{dataPacket}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                         self.client.send(packetString)
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
                     if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
                         print(
-                            f"{Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.\n")
+                            f"{Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.")
                     elif dataPacket.errorControlType is ErrorControlTypes.NACK:
                         self.messagesQueue.appendleft(dataPacket.toString())
+                    print(
+                        f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                     self.client.send(self.token.toString())
                     self.token = None
                 # Não sou a origem nem o destino:
