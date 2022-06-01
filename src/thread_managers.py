@@ -55,7 +55,7 @@ class SocketThreadManager:
                 print(f"Recebi Dados: {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
                 # Sou o destino:
-                if dataPacket.destinationNickname == self.config.nickname:
+                if dataPacket.destinationNickname == self.config.nickname or (dataPacket.destinationNickname == "TODOS" and dataPacket.originNickname != self.config.nickname):
                     isCRCCorrect = CRC32.check(dataPacket)
                     if isCRCCorrect:
                         print(
