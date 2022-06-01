@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from configurations import ConfigInterpreter
+from coloring import Colors
 from thread_managers import SocketThreadManager
 
 import sys
@@ -24,8 +25,8 @@ def main() -> None:
     print(f"Deve gerar token: {config.isTokenTrue}")
 
     print(
-        "\nPara enviar pacotes, digite {sua mensagem} -> {apelido do destino}.")
-    print("Exemplo: Oi!! -> Maria\n")
+        f"\nPara enviar pacotes, escreva na última linha do arquivo {Colors.OKCYAN}messages/inputs.txt{Colors.ENDC} [sua mensagem] -> [apelido do destino].")
+    print("Exemplo: Oi -> Maria\n")
 
     # Iniciando threads.
     threadManager = SocketThreadManager(

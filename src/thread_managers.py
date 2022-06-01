@@ -1,4 +1,5 @@
 import time
+import os
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
@@ -87,22 +88,33 @@ class SocketThreadManager:
     def __inputThread(self) -> None:
         # 20% dos pacotes serão enviados com erros propositais.
         faultInserter = PacketFaultInserter(20.0)
+        # Caminho do arquivo inputs.txt
+        absoluteFilePath = os.path.abspath("messages/inputs.txt")
+        # Último input do usuário:
+        lastUserInput = ""
         while True:
-            userInput = input()
-            splitted = userInput.split(" -> ")
-            if len(splitted) >= 2:
-                message = splitted[0]
-                destinationNickname = splitted[1]
-                crc = CRC32.calculate(message)
-                dataPacket = DataPacket(
-                    ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
-                    self.config.nickname,
-                    destinationNickname,
-                    crc,
-                    message
-                )
-                faultInserter.tryInsert(dataPacket)
-                self.messagesQueue.append(dataPacket.toString())
+            userInput = ""
+            with open(absoluteFilePath) as inputsFile:
+                # Última linha:
+                lines = inputsFile.readlines()
+                if len(lines) > 0:
+                    userInput = lines[-1]
+            if userInput != "" and userInput != lastUserInput:
+                splitted = userInput.split(" -> ")
+                if len(splitted) >= 2:
+                    message = splitted[0]
+                    destinationNickname = splitted[1]
+                    crc = CRC32.calculate(message)
+                    dataPacket = DataPacket(
+                        ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
+                        self.config.nickname,
+                        destinationNickname,
+                        crc,
+                        message
+                    )
+                    faultInserter.tryInsert(dataPacket)
+                    self.messagesQueue.append(dataPacket.toString())
+                    lastUserInput = userInput
 
     def startThreads(self) -> None:
         Thread(target=self.__socketsThread, name="Sockets Thread").start()
