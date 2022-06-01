@@ -66,16 +66,9 @@ class SocketThreadManager:
                         print(
                             f"{Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
                         dataPacket.errorControlType = ErrorControlTypes.NACK
-                    # Verificar se of if-else de baixo está certo!
-                    if self.token is not None:
-                        print(
-                            f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                        self.client.send(self.token.toString())
-                        self.token = None
-                    else:
-                        print(
-                            f"Enviando dados [{dataPacket.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                        self.client.send(dataPacket.toString())
+                    print(
+                        f"Enviando dados [{dataPacket.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
+                    self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
                     self.waiting = False
