@@ -76,6 +76,6 @@ class UDPServerSocket:
                 "", ResponseTimeTypes.TIMEOUT_EXCEEDED)
         return clientResponse
 
-    def setTimes(self, minSecs: int, maxSecs) -> None:
+    def setTimes(self, minSecs: int, maxSecs: int) -> None:
         self.minSecs = minSecs
         self.maxSecs = maxSecs
