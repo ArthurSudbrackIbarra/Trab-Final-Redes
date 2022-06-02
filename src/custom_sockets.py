@@ -25,6 +25,8 @@ class UDPClientSocket:
 
 
 # Enum com os tipos de tempo de resposta.
+
+
 class ResponseTimeTypes(enum.Enum):
     LESS_THAN_EXPECTED = 1
     OK = 2
