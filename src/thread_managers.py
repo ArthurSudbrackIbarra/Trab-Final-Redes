@@ -2,7 +2,7 @@ import time
 import os
 from socket import socket
 from configurations import Configuration
-from custom_sockets import UDPClientSocket, UDPServerSocket
+from custom_sockets import UDPClientSocket, ResponseTimeTypes, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
 from coloring import Colors
 from collections import deque
@@ -26,6 +26,8 @@ class SocketThreadManager:
             port=serverSocketPort,
             bufferSize=1024
         )
+        # Tempo mínimo e máximo de espera:
+        self.server.setTimes(minSecs=-1, maxSecs=10)
         self.token = TokenPacket() if config.isTokenTrue else None
         self.messagesQueue = deque()
         self.receivedNACK = False
@@ -42,16 +44,20 @@ class SocketThreadManager:
                     print(
                         f"\nEnviando próxima mensagem da fila: '{nextMessage}'")
                     self.client.send(nextMessage)
-            # Tentando receber um pacote por 10 segundos.
-            self.server.setTimeout(10)
-            packetString = ""
-            try:
-                packetString = self.server.receive()
-            except socket.timeout:
+            # Tentando receber um pacote por x segundos.
+            clientResponse = self.server.receive()
+            # Tempo de espera menor que o mínimo.
+            if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED:
                 print(
-                    f"{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
+                    "Um pacote foi recebido em um tempo menor que o esperado. Um token deve ser removido da rede.")
+            # Tempo de espera maior que o máximo.
+            elif clientResponse.responseTime is ResponseTimeTypes.TIMEOUT_EXCEEDED:
+                print(
+                    f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
                 self.token = TokenPacket()
                 continue
+            # Tempo de espera OK.
+            packetString = clientResponse.message
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
             if packetType == PacketIdentifier.TOKEN:

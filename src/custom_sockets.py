@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import enum
 import socket
+import time
+from math import floor
 
 
 # Classe do socket cliente UDP.
@@ -21,6 +24,24 @@ class UDPClientSocket:
         self.udpClientSocket.sendto(bytesToSend, self.serverAddressPort)
 
 
+# Enum com os tipos de tempo de resposta.
+class ResponseTimeTypes(enum.Enum):
+    LESS_THAN_EXPECTED = 1
+    OK = 2
+    TIMEOUT_EXCEEDED = 3
+
+
+# Classe que representa um pacote que o servidor recebeu de um cliente.
+
+
+class ClientResponse:
+    def __init__(self,
+                 message: str,
+                 responseTime: ResponseTimeTypes):
+        self.message = message
+        self.responseTime = responseTime
+
+
 # Classe do socket servidor UDP.
 
 
@@ -33,11 +54,28 @@ class UDPServerSocket:
         self.udpServerSocket = socket.socket(
             family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.udpServerSocket.bind(("", port))
+        self.minSecs = -1
+        self.maxSecs = 10000
 
-    def receive(self) -> str:
-        while(True):
+    def receive(self) -> ClientResponse:
+        self.udpServerSocket.settimeout(self.maxSecs)
+        secondsBefore = floor(time.time()) * 1000000
+        clientResponse = None
+        bytesAddressPair = ()
+        try:
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
-            return bytesAddressPair[0].decode()
+            secondsAfter = floor(time.time()) * 1000000
+            message = bytesAddressPair[0].decode()
+            if secondsAfter - secondsBefore <= self.minSecs:
+                clientResponse = ClientResponse(
+                    message, ResponseTimeTypes.LESS_THAN_EXPECTED)
+            else:
+                clientResponse = ClientResponse(message, ResponseTimeTypes.OK)
+        except socket.timeout:
+            clientResponse = ClientResponse(
+                "", ResponseTimeTypes.TIMEOUT_EXCEEDED)
+        return clientResponse
 
-    def setTimeout(self, time: int) -> None:
-        self.udpServerSocket.settimeout(time)
+    def setTimes(self, minSecs: int, maxSecs) -> None:
+        self.minSecs = minSecs
+        self.maxSecs = maxSecs
