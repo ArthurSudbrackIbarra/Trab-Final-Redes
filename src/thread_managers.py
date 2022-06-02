@@ -1,5 +1,6 @@
 import time
 import os
+from socket import socket
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
@@ -38,9 +39,19 @@ class SocketThreadManager:
                     self.token = None
                 else:
                     nextMessage = self.messagesQueue.popleft()
-                    print(f"\nEnviando próxima mensagem da fila: '{nextMessage}'")
+                    print(
+                        f"\nEnviando próxima mensagem da fila: '{nextMessage}'")
                     self.client.send(nextMessage)
-            packetString = self.server.receive()
+            # Tentando receber um pacote por 10 segundos.
+            self.server.setTimeout(10)
+            packetString = ""
+            try:
+                packetString = self.server.receive()
+            except socket.timeout:
+                print(
+                    f"{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
+                self.token = TokenPacket()
+                continue
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
             if packetType == PacketIdentifier.TOKEN:
@@ -79,7 +90,8 @@ class SocketThreadManager:
                             print(
                                 f"Recebi {Colors.FAIL}[NACK]{Colors.ENDC} para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
                             self.receivedNACK = True
-                            self.messagesQueue.appendleft(dataPacket.toString())
+                            self.messagesQueue.appendleft(
+                                dataPacket.toString())
                         else:
                             print(
                                 f"Mesmo após o reenvio do pacote, um {Colors.FAIL}[NACK]{Colors.ENDC} foi recebido novamente. O pacote não será adicionado na fila novamente.")

@@ -38,3 +38,6 @@ class UDPServerSocket:
         while(True):
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
             return bytesAddressPair[0].decode()
+
+    def setTimeout(self, time: int) -> None:
+        self.udpServerSocket.settimeout(time)
