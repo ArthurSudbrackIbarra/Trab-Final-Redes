@@ -40,10 +40,13 @@ class SocketThreadManager:
             if self.token is not None:
                 if len(self.messagesQueue) == 0:
                     numberGenerated = random.random()
-                    # 5% dos casos não enviará o token.
-                    if self.tokenFailure and numberGenerated < 0.95:
+                    # 5% dos casos não enviará o token se tokenFailure = True.
+                    if not self.tokenFailure or numberGenerated < 0.95:
                         self.client.send(self.token.toString())
-                    self.token = None
+                    else:
+                        print(
+                            f"{Colors.OKBLUE}Removendo{Colors.ENDC} token da rede...")
+                        self.token = None
                 else:
                     nextMessage = self.messagesQueue.popleft()
                     print(
@@ -107,13 +110,16 @@ class SocketThreadManager:
                             print(
                                 f"Mesmo após o reenvio do pacote, um {Colors.FAIL}[NACK]{Colors.ENDC} foi recebido novamente. O pacote não será adicionado na fila novamente.")
                             self.receivedNACK = False
-                    print(
-                        f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                     numberGenerated = random.random()
-                    # 5% dos casos não enviará o token.
-                    if self.tokenFailure and numberGenerated < 0.95:
+                    # 5% dos casos não enviará o token se tokenFailure = True.
+                    if not self.tokenFailure or numberGenerated < 0.95:
+                        print(
+                            f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                         self.client.send(self.token.toString())
-                    self.token = None
+                    else:
+                        print(
+                            f"{Colors.OKBLUE}Removendo{Colors.ENDC} token da rede...")
+                        self.token = None
                 # Não sou a origem nem o destino:
                 else:
                     self.client.send(packetString)
