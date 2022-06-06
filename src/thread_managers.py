@@ -1,6 +1,6 @@
 import time
 import os
-from socket import socket
+import random
 from configurations import Configuration
 from custom_sockets import UDPClientSocket, ResponseTimeTypes, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
@@ -15,7 +15,8 @@ from threading import Thread
 class SocketThreadManager:
     def __init__(self,
                  config: Configuration,
-                 serverSocketPort: int = 9000):
+                 serverSocketPort: int = 9000,
+                 tokenFailure: bool = False):
         self.config = config
         self.client = UDPClientSocket(
             serverAddress=config.nextMachineIP,
@@ -31,13 +32,17 @@ class SocketThreadManager:
         self.token = TokenPacket() if config.isTokenTrue else None
         self.messagesQueue = deque()
         self.receivedNACK = False
+        self.tokenFailure = tokenFailure
 
     def __socketsThread(self) -> None:
         while True:
             # Se tenho o token:
             if self.token is not None:
                 if len(self.messagesQueue) == 0:
-                    self.client.send(self.token.toString())
+                    numberGenerated = random.random()
+                    # 5% dos casos não enviará o token.
+                    if self.tokenFailure and numberGenerated < 0.95:
+                        self.client.send(self.token.toString())
                     self.token = None
                 else:
                     nextMessage = self.messagesQueue.popleft()
@@ -104,7 +109,10 @@ class SocketThreadManager:
                             self.receivedNACK = False
                     print(
                         f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                    self.client.send(self.token.toString())
+                    numberGenerated = random.random()
+                    # 5% dos casos não enviará o token.
+                    if self.tokenFailure and numberGenerated < 0.95:
+                        self.client.send(self.token.toString())
                     self.token = None
                 # Não sou a origem nem o destino:
                 else:
