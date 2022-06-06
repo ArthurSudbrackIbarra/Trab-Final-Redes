@@ -12,7 +12,7 @@ import random
 class ErrorControlTypes(enum.Enum):
     MACHINE_DOES_NOT_EXIST = "maquinanaoexiste"
     ACK = "ACK"
-    NACK = "NACK"
+    NAK = "NAK"
 
 
 # Classe para representar um pacote de token.

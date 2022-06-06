@@ -31,7 +31,7 @@ class SocketThreadManager:
         self.server.setTimes(minSecs=-1, maxSecs=10)
         self.token = TokenPacket() if config.isTokenTrue else None
         self.messagesQueue = deque()
-        self.receivedNACK = False
+        self.receivedNAK = False
         self.tokenFailure = tokenFailure
 
     def __socketsThread(self) -> None:
@@ -88,8 +88,8 @@ class SocketThreadManager:
                         dataPacket.errorControlType = ErrorControlTypes.ACK
                     else:
                         print(
-                            f"Retornando {Colors.FAIL}[NACK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
-                        dataPacket.errorControlType = ErrorControlTypes.NACK
+                            f"Retornando {Colors.FAIL}[NAK]{Colors.ENDC} - Origem: {dataPacket.originNickname}, o CRC não bate.")
+                        dataPacket.errorControlType = ErrorControlTypes.NAK
                     self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
@@ -99,17 +99,17 @@ class SocketThreadManager:
                     elif dataPacket.errorControlType is ErrorControlTypes.ACK:
                         print(
                             f"Recebi {Colors.OKGREEN}[ACK]{Colors.ENDC} para a mensagem '{dataPacket.message}' - o recebimento do pacote foi confirmado.")
-                    elif dataPacket.errorControlType is ErrorControlTypes.NACK:
-                        if not self.receivedNACK:
+                    elif dataPacket.errorControlType is ErrorControlTypes.NAK:
+                        if not self.receivedNAK:
                             print(
-                                f"Recebi {Colors.FAIL}[NACK]{Colors.ENDC} para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
-                            self.receivedNACK = True
+                                f"Recebi {Colors.FAIL}[NAK]{Colors.ENDC} para a mensagem '{dataPacket.message}' - colocando o pacote no início da fila para tentar novamente.")
+                            self.receivedNAK = True
                             self.messagesQueue.appendleft(
                                 dataPacket.toString())
                         else:
                             print(
-                                f"Mesmo após o reenvio do pacote, um {Colors.FAIL}[NACK]{Colors.ENDC} foi recebido novamente. O pacote não será adicionado na fila novamente.")
-                            self.receivedNACK = False
+                                f"Mesmo após o reenvio do pacote, um {Colors.FAIL}[NAK]{Colors.ENDC} foi recebido novamente. O pacote não será adicionado na fila novamente.")
+                            self.receivedNAK = False
                     numberGenerated = random.random()
                     # 5% dos casos não enviará o token se tokenFailure = True.
                     if not self.tokenFailure or numberGenerated < 0.95:
