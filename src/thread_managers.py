@@ -46,7 +46,7 @@ class SocketThreadManager:
                     else:
                         print(
                             f"{Colors.OKBLUE}Removendo{Colors.ENDC} token da rede...")
-                        self.token = None
+                    self.token = None
                 else:
                     nextMessage = self.messagesQueue.popleft()
                     print(
@@ -119,7 +119,7 @@ class SocketThreadManager:
                     else:
                         print(
                             f"{Colors.OKBLUE}Removendo{Colors.ENDC} token da rede...")
-                        self.token = None
+                    self.token = None
                 # Não sou a origem nem o destino:
                 else:
                     self.client.send(packetString)
