@@ -86,11 +86,13 @@ class PacketIdentifier:
 class CRC32:
     @staticmethod
     def calculate(message: str) -> int:
-        encodedBytes = str.encode(message)
+        encodedBytes = message.rstrip("\x00").encode()
         return zlib.crc32(encodedBytes)
 
     @staticmethod
     def check(packet: DataPacket) -> bool:
+        print(f"CRC recebido: {packet.crc}")
+        print(f"CRC calculado: {CRC32.calculate(packet.message)}\n")
         return CRC32.calculate(packet.message) == packet.crc
 
 
