@@ -68,7 +68,6 @@ class UDPServerSocket:
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
             secondsAfter = time.time()
             message = bytesAddressPair[0].decode()
-            print(f"\nDiferença de segundos: {secondsAfter - secondsBefore}")
             if secondsAfter - secondsBefore <= self.minSecs:
                 clientResponse = ClientResponse(
                     message, ResponseTimeTypes.LESS_THAN_EXPECTED)
