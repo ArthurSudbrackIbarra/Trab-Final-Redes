@@ -134,15 +134,15 @@ class SocketThreadManager:
         faultInserter = PacketFaultInserter(20.0)
         # Caminho do arquivo inputs.txt
         absoluteFilePath = os.path.abspath("messages/inputs.txt")
+        oldUserInputs = []
         while True:
-            userInputs = []
-            with open(absoluteFilePath, "r+") as inputsFile:
+            newUserInputs = []
+            with open(absoluteFilePath, "r") as inputsFile:
                 lines = inputsFile.readlines()
                 if len(lines) > 0:
-                    userInputs = lines[:10]
-                    inputsFile.truncate(0)
-            if len(userInputs) > 0:
-                for userInput in userInputs:
+                    newUserInputs = lines[:10]
+            if len(newUserInputs) > 0 and newUserInputs != oldUserInputs:
+                for userInput in newUserInputs:
                     splitted = userInput.split(" -> ")
                     if len(splitted) >= 2:
                         message = splitted[0]
@@ -159,6 +159,7 @@ class SocketThreadManager:
                         self.messagesQueue.append(dataPacket.toString())
                         print(
                             f"\nMensagem {Colors.OKCYAN}'{message}'{Colors.ENDC} para {Colors.OKCYAN}'{destinationNickname}'{Colors.ENDC} colocada na fila!")
+                        oldUserInputs = newUserInputs
 
     def startThreads(self) -> None:
         Thread(target=self.__socketsThread, name="Sockets Thread").start()
