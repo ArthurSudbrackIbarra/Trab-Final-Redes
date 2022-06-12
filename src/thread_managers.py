@@ -56,19 +56,20 @@ class SocketThreadManager:
             clientResponse = self.server.receive()
             packetString = clientResponse.message
             packetType = PacketIdentifier.identify(packetString)
+            print(packetType)
+            # Não recebi nada:
+            if packetType == PacketIdentifier.UNKNOWN:
+                print(
+                    f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
+                self.token = TokenPacket()
             # Recebi token:
-            if packetType == PacketIdentifier.TOKEN:
+            elif packetType == PacketIdentifier.TOKEN or packetType == PacketIdentifier.UNKNOWN:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 # Tempo de espera menor que o mínimo.
                 if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED:
                     print(
                         f"\n{Colors.OKBLUE}Descartando{Colors.ENDC} o token, pois este foi recebido em um tempo menor que o esperado.")
-                # Tempo de espera maior que o máximo.
-                elif clientResponse.responseTime is ResponseTimeTypes.TIMEOUT_EXCEEDED:
-                    print(
-                        f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
-                    self.token = TokenPacket()
                 else:
                     self.token = TokenPacket()
                     time.sleep(self.config.tokenTime)

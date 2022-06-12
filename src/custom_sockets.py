@@ -61,12 +61,12 @@ class UDPServerSocket:
 
     def receive(self) -> ClientResponse:
         self.udpServerSocket.settimeout(self.maxSecs)
-        secondsBefore = floor(time.time()) * 1000000
+        secondsBefore = floor(time.time())
         clientResponse = None
         bytesAddressPair = ()
         try:
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
-            secondsAfter = floor(time.time()) * 1000000
+            secondsAfter = floor(time.time())
             message = bytesAddressPair[0].decode()
             if secondsAfter - secondsBefore <= self.minSecs:
                 clientResponse = ClientResponse(
