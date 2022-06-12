@@ -56,7 +56,6 @@ class SocketThreadManager:
             clientResponse = self.server.receive()
             packetString = clientResponse.message
             packetType = PacketIdentifier.identify(packetString)
-            print(packetType)
             # Não recebi nada:
             if packetType == PacketIdentifier.UNKNOWN:
                 print(
