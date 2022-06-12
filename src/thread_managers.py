@@ -143,7 +143,7 @@ class SocketThreadManager:
                     newUserInputs = lines[:10]
             if len(newUserInputs) > 0 and newUserInputs != oldUserInputs:
                 for userInput in newUserInputs:
-                    splitted = userInput.split(" -> ")
+                    splitted = userInput.strip().split(" -> ")
                     if len(splitted) >= 2:
                         message = splitted[0]
                         destinationNickname = splitted[1]
