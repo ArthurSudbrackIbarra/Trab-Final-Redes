@@ -42,6 +42,7 @@ class SocketThreadManager:
                     numberGenerated = random.random()
                     # 5% dos casos não enviará o token se tokenFailure = True.
                     if not self.tokenFailure or numberGenerated < 0.95:
+                        print("\nEnviando token para a máquina à direita.")
                         self.client.send(self.token.toString())
                     else:
                         print(
