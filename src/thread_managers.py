@@ -2,7 +2,7 @@ import time
 import os
 import random
 from configurations import Configuration
-from custom_sockets import UDPClientSocket, ResponseTimeTypes, UDPServerSocket
+from custom_sockets import UDPClientSocket, UDPServerSocket
 from packaging import ErrorControlTypes, TokenPacket, DataPacket, PacketIdentifier, CRC32, PacketFaultInserter
 from coloring import Colors
 from collections import deque
@@ -16,6 +16,8 @@ class SocketThreadManager:
     def __init__(self,
                  config: Configuration,
                  serverSocketPort: int = 9000,
+                 minWaitingTime: int = -1,
+                 maxWaitingTime: int = 10,
                  tokenFailure: bool = False):
         self.config = config
         self.client = UDPClientSocket(
@@ -26,13 +28,13 @@ class SocketThreadManager:
         self.server = UDPServerSocket(
             port=serverSocketPort,
             bufferSize=1024
-        )
-        # Tempo mínimo e máximo de espera:
-        self.server.setTimes(minSecs=-1, maxSecs=10)
+        ).setMaxWaitingTime(maxWaitingTime)
+        self.minWaitingTime = minWaitingTime
+        self.tokenFailure = tokenFailure
         self.token = TokenPacket() if config.isTokenTrue else None
         self.messagesQueue = deque()
         self.receivedNAK = False
-        self.tokenFailure = tokenFailure
+        self.lastTokenTime = -1
 
     def __socketsThread(self) -> None:
         while True:
@@ -67,11 +69,12 @@ class SocketThreadManager:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 # Tempo de espera menor que o mínimo.
-                if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED and self.config.isTokenTrue:
+                if time.time() - self.lastTokenTime < self.minWaitingTime:
                     print(
                         f"\n{Colors.OKBLUE}Descartando{Colors.ENDC} o token, pois este foi recebido em um tempo menor que o esperado.")
                 else:
                     self.token = TokenPacket()
+                    self.lastTokenTime = time.time()
                     time.sleep(self.config.tokenTime)
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:

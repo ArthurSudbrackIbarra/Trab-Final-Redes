@@ -2,8 +2,6 @@
 
 import enum
 import socket
-import time
-from math import floor
 
 
 # Classe do socket cliente UDP.
@@ -28,9 +26,8 @@ class UDPClientSocket:
 
 
 class ResponseTimeTypes(enum.Enum):
-    LESS_THAN_EXPECTED = 1
-    OK = 2
-    TIMEOUT_EXCEEDED = 3
+    OK = 1
+    TIMEOUT_EXCEEDED = 2
 
 
 # Classe que representa um pacote que o servidor recebeu de um cliente.
@@ -56,27 +53,19 @@ class UDPServerSocket:
         self.udpServerSocket = socket.socket(
             family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.udpServerSocket.bind(("", port))
-        self.minSecs = -1
-        self.maxSecs = 10000
+        self.maxWaitingTime = 10000
 
     def receive(self) -> ClientResponse:
-        self.udpServerSocket.settimeout(self.maxSecs)
-        secondsBefore = time.time()
+        self.udpServerSocket.settimeout(self.maxWaitingTime)
         clientResponse = None
         try:
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
-            secondsAfter = time.time()
             message = bytesAddressPair[0].decode()
-            if secondsAfter - secondsBefore <= self.minSecs:
-                clientResponse = ClientResponse(
-                    message, ResponseTimeTypes.LESS_THAN_EXPECTED)
-            else:
-                clientResponse = ClientResponse(message, ResponseTimeTypes.OK)
+            clientResponse = ClientResponse(message, ResponseTimeTypes.OK)
         except socket.timeout:
             clientResponse = ClientResponse(
                 "", ResponseTimeTypes.TIMEOUT_EXCEEDED)
         return clientResponse
 
-    def setTimes(self, minSecs: int, maxSecs: int) -> None:
-        self.minSecs = minSecs
-        self.maxSecs = maxSecs
+    def setMaxWaitingTime(self, seconds: int) -> None:
+        self.maxWaitingTime = seconds

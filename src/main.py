@@ -31,7 +31,7 @@ def main() -> None:
 
     # Iniciando threads.
     threadManager = SocketThreadManager(
-        config=config, serverSocketPort=serverSocketPort, tokenFailure=True)
+        config=config, serverSocketPort=serverSocketPort, maxWaitingTime=10, minWaitingTime=3, tokenFailure=True)
     threadManager.startThreads()
 
 
