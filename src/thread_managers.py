@@ -28,7 +28,8 @@ class SocketThreadManager:
         self.server = UDPServerSocket(
             port=serverSocketPort,
             bufferSize=1024
-        ).setMaxWaitingTime(maxWaitingTime)
+        )
+        self.server.setMaxWaitingTime(maxWaitingTime)
         self.minWaitingTime = minWaitingTime
         self.tokenFailure = tokenFailure
         self.token = TokenPacket() if config.isTokenTrue else None
