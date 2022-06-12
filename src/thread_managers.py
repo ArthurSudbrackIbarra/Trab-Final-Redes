@@ -116,8 +116,6 @@ class SocketThreadManager:
                             print(
                                 f"Enviando token [{Colors.WARNING}{self.token.toString()}{Colors.ENDC}] para a máquina à direita com IP: {self.config.nextMachineIP}")
                             self.client.send(self.token.toString())
-                        else:
-                            print(f"{Colors.FAIL}ERRO INESPERADO{Colors.ENDC}")
                     else:
                         print(
                             f"{Colors.OKBLUE}\nRemovendo{Colors.ENDC} token da rede...")
