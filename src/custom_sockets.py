@@ -61,12 +61,12 @@ class UDPServerSocket:
 
     def receive(self) -> ClientResponse:
         self.udpServerSocket.settimeout(self.maxSecs)
-        secondsBefore = floor(time.time())
+        secondsBefore = time.time()
         clientResponse = None
         bytesAddressPair = ()
         try:
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
-            secondsAfter = floor(time.time())
+            secondsAfter = time.time()
             message = bytesAddressPair[0].decode()
             print(f"\nDiferença de segundos: {secondsAfter - secondsBefore}")
             if secondsAfter - secondsBefore <= self.minSecs:
