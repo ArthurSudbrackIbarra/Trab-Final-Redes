@@ -134,34 +134,31 @@ class SocketThreadManager:
         faultInserter = PacketFaultInserter(20.0)
         # Caminho do arquivo inputs.txt
         absoluteFilePath = os.path.abspath("messages/inputs.txt")
-        # Último input do usuário:
-        lastUserInput = ""
         while True:
-            userInput = ""
-            with open(absoluteFilePath) as inputsFile:
+            userInputs = []
+            with open(absoluteFilePath, "r+") as inputsFile:
                 lines = inputsFile.readlines()
                 if len(lines) > 0:
-                    # Última linha:
-                    userInput = lines[-1]
-            # Se tem input e não é o mesmo de antes:
-            if userInput != "" and userInput != lastUserInput:
-                splitted = userInput.split(" -> ")
-                if len(splitted) >= 2:
-                    message = splitted[0]
-                    destinationNickname = splitted[1]
-                    crc = CRC32.calculate(message)
-                    dataPacket = DataPacket(
-                        ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
-                        self.config.nickname,
-                        destinationNickname,
-                        crc,
-                        message
-                    )
-                    faultInserter.tryInsert(dataPacket)
-                    self.messagesQueue.append(dataPacket.toString())
-                    print(
-                        f"\nMensagem {Colors.OKCYAN}'{message}'{Colors.ENDC} para {Colors.OKCYAN}'{destinationNickname}'{Colors.ENDC} colocada na fila!")
-                    lastUserInput = userInput
+                    userInputs = lines[:10]
+                    inputsFile.truncate(0)
+            if len(userInputs) > 0:
+                for userInput in userInputs:
+                    splitted = userInput.split(" -> ")
+                    if len(splitted) >= 2:
+                        message = splitted[0]
+                        destinationNickname = splitted[1]
+                        crc = CRC32.calculate(message)
+                        dataPacket = DataPacket(
+                            ErrorControlTypes.MACHINE_DOES_NOT_EXIST,
+                            self.config.nickname,
+                            destinationNickname,
+                            crc,
+                            message
+                        )
+                        faultInserter.tryInsert(dataPacket)
+                        self.messagesQueue.append(dataPacket.toString())
+                        print(
+                            f"\nMensagem {Colors.OKCYAN}'{message}'{Colors.ENDC} para {Colors.OKCYAN}'{destinationNickname}'{Colors.ENDC} colocada na fila!")
 
     def startThreads(self) -> None:
         Thread(target=self.__socketsThread, name="Sockets Thread").start()
