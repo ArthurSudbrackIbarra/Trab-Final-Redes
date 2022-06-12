@@ -69,7 +69,7 @@ class SocketThreadManager:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 # Tempo de espera menor que o mínimo.
-                if time.time() - self.lastTokenTime < self.minWaitingTime:
+                if (time.time() - self.lastTokenTime < self.minWaitingTime) and self.config.isTokenTrue:
                     print(
                         f"\n{Colors.OKBLUE}Descartando{Colors.ENDC} o token, pois este foi recebido em um tempo menor que o esperado.")
                 else:
