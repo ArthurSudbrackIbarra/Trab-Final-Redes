@@ -63,7 +63,7 @@ class SocketThreadManager:
                     f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
                 self.token = TokenPacket()
             # Recebi token:
-            elif packetType == PacketIdentifier.TOKEN or packetType == PacketIdentifier.UNKNOWN:
+            elif packetType == PacketIdentifier.TOKEN:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 # Tempo de espera menor que o mínimo.
@@ -112,9 +112,12 @@ class SocketThreadManager:
                     numberGenerated = random.random()
                     # 5% dos casos não enviará o token se tokenFailure = True.
                     if not self.tokenFailure or numberGenerated < 0.95:
-                        print(
-                            f"Enviando token [{self.token.toString()}] para a máquina à direita com IP: {self.config.nextMachineIP}")
-                        self.client.send(self.token.toString())
+                        if self.token is not None:
+                            print(
+                                f"Enviando token [{Colors.WARNING}{self.token.toString()}{Colors.ENDC}] para a máquina à direita com IP: {self.config.nextMachineIP}")
+                            self.client.send(self.token.toString())
+                        else:
+                            print(f"{Colors.FAIL}ERRO INESPERADO{Colors.ENDC}")
                     else:
                         print(
                             f"{Colors.OKBLUE}\nRemovendo{Colors.ENDC} token da rede...")
