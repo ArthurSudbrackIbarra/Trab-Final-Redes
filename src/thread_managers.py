@@ -60,7 +60,7 @@ class SocketThreadManager:
             # Não recebi nada:
             if packetType == PacketIdentifier.UNKNOWN and self.config.isTokenTrue:
                 print(
-                    f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
+                    f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} atingido, um novo token será gerado.")
                 self.token = TokenPacket()
             # Recebi token:
             elif packetType == PacketIdentifier.TOKEN:

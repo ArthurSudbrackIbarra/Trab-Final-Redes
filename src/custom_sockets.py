@@ -63,7 +63,6 @@ class UDPServerSocket:
         self.udpServerSocket.settimeout(self.maxSecs)
         secondsBefore = time.time()
         clientResponse = None
-        bytesAddressPair = ()
         try:
             bytesAddressPair = self.udpServerSocket.recvfrom(self.bufferSize)
             secondsAfter = time.time()
