@@ -5,4 +5,4 @@
 :: start python "src/main.py src/config/config-3.txt 9100"
 
 cd src/
-python main.py
+python3 main.py config/config-4.txt 9000

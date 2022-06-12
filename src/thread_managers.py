@@ -54,26 +54,24 @@ class SocketThreadManager:
                     self.client.send(nextMessage)
             # Tentando receber um pacote por x segundos.
             clientResponse = self.server.receive()
-            # Tempo de espera menor que o mínimo.
-            if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED:
-                print(
-                    "Um pacote foi recebido em um tempo menor que o esperado. Um token deve ser removido da rede.")
-            # Tempo de espera maior que o máximo.
-            elif clientResponse.responseTime is ResponseTimeTypes.TIMEOUT_EXCEEDED:
-                print(
-                    f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
-                self.token = TokenPacket()
-                continue
-            # Tempo de espera OK.
             packetString = clientResponse.message
             packetType = PacketIdentifier.identify(packetString)
             # Recebi token:
             if packetType == PacketIdentifier.TOKEN:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
-                self.token = TokenPacket()
-                time.sleep(self.config.tokenTime)
-                continue
+                # Tempo de espera menor que o mínimo.
+                if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED:
+                    print(
+                        f"\n{Colors.OKBLUE}Descartando{Colors.ENDC} o token, pois este foi recebido em um tempo menor que o esperado.")
+                # Tempo de espera maior que o máximo.
+                elif clientResponse.responseTime is ResponseTimeTypes.TIMEOUT_EXCEEDED:
+                    print(
+                        f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
+                    self.token = TokenPacket()
+                else:
+                    self.token = TokenPacket()
+                    time.sleep(self.config.tokenTime)
             # Recebi dados:
             elif packetType == PacketIdentifier.DATA:
                 print("\n" + ("-" * 100))
@@ -93,7 +91,7 @@ class SocketThreadManager:
                     self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
-                    if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
+                    if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST and dataPacket.destinationNickname != "TODOS":
                         print(
                             f"Recebi {Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.")
                     elif dataPacket.errorControlType is ErrorControlTypes.ACK:
