@@ -24,7 +24,7 @@ def main() -> None:
     print(f"Deve gerar token: {config.isTokenTrue}")
 
     print(
-        f"\nPara enviar pacotes, escreva na última linha do arquivo {Colors.OKBLUE}messages/inputs.txt{Colors.ENDC} [sua mensagem] -> [apelido do destino]. Após isso, SALVE O ARQUIVO.")
+        f"\nPara enviar pacotes, escreva no arquivo {Colors.OKBLUE}messages/inputs.txt{Colors.ENDC} [sua mensagem] -> [apelido do destino]. Após isso, SALVE O ARQUIVO.")
     print("Exemplo: Oi -> Maria\n")
     print("=" * 100)
     input("\nPressione enter para continuar...")
