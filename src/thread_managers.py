@@ -58,7 +58,7 @@ class SocketThreadManager:
             packetString = clientResponse.message
             packetType = PacketIdentifier.identify(packetString)
             # Não recebi nada:
-            if packetType == PacketIdentifier.UNKNOWN:
+            if packetType == PacketIdentifier.UNKNOWN and self.config.isTokenTrue:
                 print(
                     f"\n{Colors.FAIL}[Timeout]{Colors.ENDC} de 10 segundos atingido, um novo token será gerado.")
                 self.token = TokenPacket()
@@ -67,7 +67,7 @@ class SocketThreadManager:
                 print(
                     f"\nRecebi Token: {Colors.WARNING}{packetString}{Colors.ENDC}")
                 # Tempo de espera menor que o mínimo.
-                if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED:
+                if clientResponse.responseTime is ResponseTimeTypes.LESS_THAN_EXPECTED and self.config.isTokenTrue:
                     print(
                         f"\n{Colors.OKBLUE}Descartando{Colors.ENDC} o token, pois este foi recebido em um tempo menor que o esperado.")
                 else:
