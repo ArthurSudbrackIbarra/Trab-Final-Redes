@@ -82,8 +82,14 @@ class SocketThreadManager:
                 print("\n" + ("-" * 100))
                 print(f"Recebi Dados: {packetString}")
                 dataPacket = DataPacket.fromString(packetString)
+                # Broadcast:
+                if dataPacket.destinationNickname == "TODOS" and dataPacket.originNickname != self.config.nickname:
+                    print(
+                        f"Retornando {Colors.OKCYAN}[maquinanaoexiste]{Colors.ENDC}, a mensagem recebida foi enviada em broadcast.")
+                    dataPacket.errorControlType = ErrorControlTypes.MACHINE_DOES_NOT_EXIST
+                    self.client.send(dataPacket.toString())
                 # Sou o destino:
-                if dataPacket.destinationNickname == self.config.nickname or (dataPacket.destinationNickname == "TODOS" and dataPacket.originNickname != self.config.nickname):
+                elif dataPacket.destinationNickname == self.config.nickname:
                     isCRCCorrect = CRC32.check(dataPacket)
                     if isCRCCorrect:
                         print(
@@ -96,7 +102,10 @@ class SocketThreadManager:
                     self.client.send(dataPacket.toString())
                 # Sou a origem:
                 elif dataPacket.originNickname == self.config.nickname:
-                    if dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST and dataPacket.destinationNickname != "TODOS":
+                    if dataPacket.destinationNickname == "TODOS" and dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
+                        print(
+                            f"Recebi {Colors.OKCYAN}[maquinanaoexiste]{Colors.ENDC} para a mensagem '{dataPacket.message}' - retorno de meu BROADCAST.")
+                    elif dataPacket.errorControlType is ErrorControlTypes.MACHINE_DOES_NOT_EXIST:
                         print(
                             f"Recebi {Colors.FAIL}[maquinanaoexiste]{Colors.ENDC} - A mensagem com conteúdo '{dataPacket.message}' não pôde ser enviada, pois a máquina destino '{dataPacket.destinationNickname}' não se encontra na rede.")
                     elif dataPacket.errorControlType is ErrorControlTypes.ACK:
